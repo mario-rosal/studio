@@ -50,20 +50,20 @@ export function LogsTable() {
       </CardHeader>
       <CardContent>
         <Accordion type="single" collapsible className="w-full">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]"><span className="sr-only">Details</span></TableHead>
-              <TableHead>Flow Name</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Timestamp</TableHead>
-              <TableHead className="text-right">Duration</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[50px]"><span className="sr-only">Details</span></TableHead>
+                <TableHead>Flow Name</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Timestamp</TableHead>
+                <TableHead className="text-right">Duration</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {executions.map((execution) => (
                 <AccordionItem value={execution.id} key={execution.id} asChild>
-                  <>
+                  <React.Fragment>
                     <TableRow>
                       <TableCell className="w-[50px]">
                         <AccordionTrigger>
@@ -108,8 +108,12 @@ export function LogsTable() {
                               </pre>
                             </div>
                             <div className="flex gap-2">
-                              <Button size="sm" variant="outline" onClick={() => handleAnalyze(execution)}>
-                                <Bot className="mr-2 h-4 w-4" />
+                              <Button size="sm" variant="outline" onClick={() => handleAnalyze(execution)} disabled={isAnalyzing && selectedExecutionId === execution.id}>
+                                {isAnalyzing && selectedExecutionId === execution.id ? (
+                                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Bot className="mr-2 h-4 w-4" />
+                                )}
                                 {isAnalyzing && selectedExecutionId === execution.id ? 'Analyzing...' : 'Analyze with AI'}
                               </Button>
                               <Button size="sm" variant="secondary">
@@ -126,11 +130,11 @@ export function LogsTable() {
                         </AccordionContent>
                       </TableCell>
                     </TableRow>
-                  </>
+                  </React.Fragment>
                 </AccordionItem>
               ))}
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
         </Accordion>
       </CardContent>
     </Card>
