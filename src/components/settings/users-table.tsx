@@ -152,12 +152,12 @@ export function UsersTable() {
             <div>
               <CardTitle>User Management</CardTitle>
               <CardDescription>
-                Manage access to the n8nPilot dashboard.
+                Manage access to the MyTaskPanel dashboard.
               </CardDescription>
             </div>
             <Dialog open={isInviteDialogOpen} onOpenChange={setInviteDialogOpen}>
               <DialogTrigger asChild>
-                <Button size="sm" className="gap-1">
+                <Button size="sm" className="gap-1" onClick={() => inviteForm.reset()}>
                   <UserPlus className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                     Invite User

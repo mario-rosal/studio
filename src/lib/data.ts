@@ -55,9 +55,9 @@ export const executions: Execution[] = [
 
 export const parameters: Parameter[] = [
   { id: 'param_01', key: 'MIN_INVOICE_AMOUNT', value: '100', description: 'Minimum amount to trigger high-value workflow.' },
-  { id: 'param_02', key: 'ADMIN_EMAIL', value: 'admin@n8npilot.com', description: 'Email for critical error notifications.' },
+  { id: 'param_02', key: 'ADMIN_EMAIL', value: 'admin@mytaskpanel.com', description: 'Email for critical error notifications.' },
   { id: 'param_03', key: 'CRM_API_KEY', value: '**********', description: 'API Key for the main CRM system.' },
-  { id: 'param_04', key: 'WELCOME_EMAIL_SUBJECT', value: 'Welcome to n8nPilot!', description: 'Subject line for new user welcome emails.' }
+  { id: 'param_04', key: 'WELCOME_EMAIL_SUBJECT', value: 'Welcome to MyTaskPanel!', description: 'Subject line for new user welcome emails.' }
 ];
 
 export const users: User[] = [
