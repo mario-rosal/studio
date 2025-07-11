@@ -1,12 +1,13 @@
+
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, Home, Settings, FileText, ArrowRightToLine, ArrowLeftFromLine } from "lucide-react";
+import { Bot, Home, Settings, FileText, ArrowRightToLine, ArrowLeftFromLine, LogOut } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Separator } from "../ui/separator";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -46,6 +47,13 @@ export function AppSidebar() {
               </Link>
             ))}
           </nav>
+        </div>
+        <div className="mt-auto p-4">
+          <Separator className="my-2" />
+          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-primary">
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
         </div>
       </div>
     </div>
