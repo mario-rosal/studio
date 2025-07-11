@@ -36,7 +36,7 @@ export function AiAnalysisView({ analysis, isLoading }: AiAnalysisViewProps) {
       <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader className="flex flex-row items-center gap-2">
-          <Lightbulb className="h-6 w-6 text-yellow-500" />
+          <Lightbulb className="h-6 w-6 text-amber-500" />
           <div>
             <CardTitle>Insights</CardTitle>
             <CardDescription>Potential issues and observations.</CardDescription>
