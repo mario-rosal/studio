@@ -55,6 +55,14 @@ export function Header() {
   const pageTitle = pathname.split('/').filter(Boolean).pop() || 'Dashboard';
   const formattedTitle = pageTitle.charAt(0).toUpperCase() + pageTitle.slice(1);
 
+  const handleSupportClick = () => {
+    window.location.href = "mailto:support@n8npilot.com";
+  };
+
+  const handleLogout = () => {
+    console.log("Logout action triggered");
+  };
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
        <Sheet>
@@ -91,10 +99,12 @@ export function Header() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
+          <Link href="/settings" passHref>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+          </Link>
+          <DropdownMenuItem onSelect={handleSupportClick}>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleLogout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>
