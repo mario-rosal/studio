@@ -62,8 +62,8 @@ export function LogsTable() {
             </TableHeader>
             <TableBody>
               {executions.map((execution) => (
-                <AccordionItem value={execution.id} key={execution.id} asChild>
-                   <React.Fragment>
+                 <AccordionItem value={execution.id} key={execution.id} asChild>
+                   <>
                      <TableRow>
                        <TableCell className="w-[50px]">
                          <AccordionTrigger>
@@ -130,7 +130,7 @@ export function LogsTable() {
                          </AccordionContent>
                        </TableCell>
                      </TableRow>
-                   </React.Fragment>
+                   </>
                 </AccordionItem>
               ))}
             </TableBody>
@@ -140,4 +140,3 @@ export function LogsTable() {
     </Card>
   );
 }
-
