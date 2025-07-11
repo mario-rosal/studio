@@ -35,6 +35,17 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import {
   Form,
   FormControl,
   FormField,
@@ -56,11 +67,15 @@ const formSchema = z.object({
   description: z.string().min(1, { message: "Description is required." }),
 })
 
+type ParameterFormValues = z.infer<typeof formSchema>;
+
 export function ParametersTable() {
   const [parameters, setParameters] = useState<Parameter[]>(initialParameters);
-  const [open, setOpen] = useState(false);
+  const [isAddDialogOpen, setAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedParameter, setSelectedParameter] = useState<Parameter | null>(null);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<ParameterFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       key: "",
@@ -69,14 +84,39 @@ export function ParametersTable() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function handleAddSubmit(values: ParameterFormValues) {
     const newParameter: Parameter = {
       id: `param_${new Date().getTime()}`,
       ...values,
     };
     setParameters([newParameter, ...parameters]);
     form.reset();
-    setOpen(false);
+    setAddDialogOpen(false);
+  }
+
+  function handleEditSubmit(values: ParameterFormValues) {
+    if (!selectedParameter) return;
+
+    setParameters(parameters.map(p =>
+      p.id === selectedParameter.id ? { ...p, ...values } : p
+    ));
+    form.reset();
+    setEditDialogOpen(false);
+    setSelectedParameter(null);
+  }
+
+  function openEditDialog(param: Parameter) {
+    setSelectedParameter(param);
+    form.reset({
+      key: param.key,
+      value: param.value,
+      description: param.description,
+    });
+    setEditDialogOpen(true);
+  }
+
+  function handleDelete(paramId: string) {
+    setParameters(parameters.filter(p => p.id !== paramId));
   }
 
   return (
@@ -89,7 +129,7 @@ export function ParametersTable() {
                 Global variables used by your n8n workflows.
                 </CardDescription>
             </div>
-             <Dialog open={open} onOpenChange={setOpen}>
+             <Dialog open={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
                 <DialogTrigger asChild>
                     <Button size="sm" className="gap-1">
                         <PlusCircle className="h-3.5 w-3.5" />
@@ -106,7 +146,7 @@ export function ParametersTable() {
                         </DialogDescription>
                     </DialogHeader>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <form onSubmit={form.handleSubmit(handleAddSubmit)} className="space-y-4">
                              <FormField
                                 control={form.control}
                                 name="key"
@@ -177,29 +217,107 @@ export function ParametersTable() {
                     <TableCell className="font-mono text-sm">{param.value}</TableCell>
                     <TableCell>{param.description}</TableCell>
                     <TableCell>
-                        <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                            aria-haspopup="true"
-                            size="icon"
-                            variant="ghost"
-                            >
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
-                        </DropdownMenuContent>
-                        </DropdownMenu>
+                        <AlertDialog>
+                          <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                              <Button
+                              aria-haspopup="true"
+                              size="icon"
+                              variant="ghost"
+                              >
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                              </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem onSelect={() => openEditDialog(param)}>Edit</DropdownMenuItem>
+                              <AlertDialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">Delete</DropdownMenuItem>
+                              </AlertDialogTrigger>
+                          </DropdownMenuContent>
+                          </DropdownMenu>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete the parameter
+                                <span className="font-mono font-bold p-1 bg-muted rounded-sm mx-1">{param.key}</span>
+                                and remove its data from our servers.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(param.id)} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                     </TableCell>
                 </TableRow>
             ))}
           </TableBody>
         </Table>
       </CardContent>
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+                <DialogTitle>Edit Parameter</DialogTitle>
+                <DialogDescription>
+                    Update the details for this global parameter.
+                </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleEditSubmit)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="key"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Key</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g., API_ENDPOINT" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="value"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Value</FormLabel>
+                            <FormControl>
+                                <Input placeholder="e.g., https://api.example.com" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                                <Textarea placeholder="Describe what this parameter is used for." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button type="button" variant="secondary" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                        </DialogClose>
+                        <Button type="submit">Save Changes</Button>
+                    </DialogFooter>
+                </form>
+            </Form>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }
