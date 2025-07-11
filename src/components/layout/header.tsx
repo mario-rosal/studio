@@ -1,3 +1,4 @@
+
 "use client";
 import {
   Bird,
@@ -77,7 +78,9 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col p-0">
-              <AppSidebar />
+              <div className="bg-sidebar text-sidebar-foreground h-full">
+                <AppSidebar />
+              </div>
             </SheetContent>
           </Sheet>
       <div className="w-full flex-1">

@@ -21,9 +21,9 @@ export function AppSidebar() {
   ];
 
   return (
-    <div className="hidden border-r bg-muted/40 md:block">
+    <div className="hidden border-r bg-sidebar text-sidebar-foreground md:block">
       <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+        <div className="flex h-14 items-center border-b border-sidebar-border px-4 lg:h-[60px] lg:px-6">
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <Bot className="h-6 w-6 text-primary" />
             <span className="">MyTaskPanel</span>
@@ -36,9 +36,9 @@ export function AppSidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:text-sidebar-primary hover:bg-sidebar-accent",
                   {
-                    "bg-muted text-primary": pathname === item.href,
+                    "bg-sidebar-accent text-sidebar-primary": pathname === item.href,
                   }
                 )}
               >
@@ -49,8 +49,8 @@ export function AppSidebar() {
           </nav>
         </div>
         <div className="mt-auto p-4">
-          <Separator className="my-2" />
-          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-primary">
+          <Separator className="my-2 bg-sidebar-border" />
+          <Button variant="ghost" className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-primary">
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </Button>
