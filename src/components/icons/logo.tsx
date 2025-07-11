@@ -6,11 +6,23 @@ export function Logo(props: React.SVGProps<SVGSVGElement>) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
-      fill="currentColor"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       {...props}
     >
-      <path d="M13.786 4.467l-5.62 5.62-1.31-1.31a.75.75 0 00-1.06 1.06l1.839 1.84a.75.75 0 001.06 0l6.15-6.15a.75.75 0 10-1.06-1.06z" />
-      <path fillRule="evenodd" d="M12 21a9 9 0 100-18 9 9 0 000 18zm0 1.5a10.5 10.5 0 100-21 10.5 10.5 0 000 21z" clipRule="evenodd" />
+        <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+        <rect x="9" y="9" width="6" height="6"></rect>
+        <line x1="9" y1="1" x2="9" y2="4"></line>
+        <line x1="15" y1="1" x2="15" y2="4"></line>
+        <line x1="9" y1="20" x2="9" y2="23"></line>
+        <line x1="15" y1="20" x2="15" y2="23"></line>
+        <line x1="20" y1="9" x2="23" y2="9"></line>
+        <line x1="20" y1="14" x2="23" y2="14"></line>
+        <line x1="1" y1="9" x2="4" y2="9"></line>
+        <line x1="1" y1="14" x2="4" y2="14"></line>
     </svg>
   );
 }
