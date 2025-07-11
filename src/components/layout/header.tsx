@@ -55,7 +55,7 @@ export function Header() {
           </Sheet>
       <div className="w-full flex-1">
         <h1 className="font-semibold text-lg flex items-center gap-2">
-          <Logo className="h-6 w-6 text-primary" />
+          <Logo className="h-6 w-6" />
           <Link href="/">MyTaskPanel</Link>
           <span className="font-normal text-muted-foreground"> / {formattedTitle}</span>
         </h1>

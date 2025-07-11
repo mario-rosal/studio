@@ -9,30 +9,33 @@ export function Logo(props: React.SVGProps<SVGSVGElement>) {
       fill="none"
       {...props}
     >
-      <g fill="currentColor">
-        {/* Central Hexagon Shape */}
-        <path d="M50 25 l21.65 12.5 v25 L50 75 l-21.65 -12.5 v-25 L50 25z" fillOpacity="0.7" />
-        <path d="M50 25 L28.35 37.5 L28.35 62.5 L50 75 V 25z" fillOpacity="1" />
-        <path d="M50 25 l21.65 12.5 L50 50 V25z" fillOpacity="0.5" />
-        <path d="M50 75 l21.65 -12.5 L50 50 V75z" fillOpacity="0.3" />
+      <g>
+        {/* Central Hexagon - using multiple paths for different face colors */}
+        <path d="M50 25 L71.65 37.5 L50 50 L28.35 37.5 Z" fill="#2C3E50" />
+        <path d="M28.35 37.5 L50 50 L50 75 L28.35 62.5 Z" fill="#34495E" />
+        <path d="M71.65 37.5 L71.65 62.5 L50 75 L50 50 Z" fill="#5D7A99" />
 
         {/* Checkmark */}
         <path
           d="M45 53 l-7 -7 l3 -3 l4 4 l8 -8 l3 3 z"
-          fill="hsl(var(--primary-foreground))"
+          fill="#34495E"
+          fillOpacity="0.7"
         />
 
-        {/* Top-left arm */}
-        <path d="M28.35 37.5 l-15 -8.66" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="10.35" cy="27.84" r="5" />
-        
-        {/* Top-right arm */}
-        <path d="M71.65 37.5 l15 -8.66" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="89.65" cy="27.84" r="5" />
+        {/* Arms and Circles */}
+        <g stroke="#5D7A99" strokeWidth="4" strokeLinecap="round">
+          {/* Top-left arm */}
+          <path d="M28.35 37.5 l-15 -8.66" />
+          <circle cx="10.35" cy="27.84" r="5" fill="#5D7A99" />
+          
+          {/* Top-right arm */}
+          <path d="M71.65 37.5 l15 -8.66" />
+          <circle cx="89.65" cy="27.84" r="5" fill="#5D7A99" />
 
-        {/* Bottom arm */}
-        <path d="M50 75 v20" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="50" cy="98" r="5" />
+          {/* Bottom arm */}
+          <path d="M50 75 v20" />
+          <circle cx="50" cy="98" r="5" fill="#5D7A99" />
+        </g>
       </g>
     </svg>
   );
