@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useTransition } from "react";
@@ -48,6 +49,7 @@ export function LogsTable() {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <Accordion type="single" collapsible className="w-full">
         <Table>
           <TableHeader>
             <TableRow>
@@ -58,8 +60,7 @@ export function LogsTable() {
               <TableHead className="text-right">Duration</TableHead>
             </TableRow>
           </TableHeader>
-          <Accordion type="single" collapsible asChild>
-            <TableBody>
+          <TableBody>
               {executions.map((execution) => (
                 <AccordionItem value={execution.id} key={execution.id} asChild>
                   <>
@@ -128,9 +129,9 @@ export function LogsTable() {
                   </>
                 </AccordionItem>
               ))}
-            </TableBody>
-          </Accordion>
+          </TableBody>
         </Table>
+        </Accordion>
       </CardContent>
     </Card>
   );
