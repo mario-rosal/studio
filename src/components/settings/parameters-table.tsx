@@ -1,4 +1,5 @@
 "use client"
+import React, { useState } from "react"
 import {
   Table,
   TableBody,
@@ -23,9 +24,61 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { parameters } from "@/lib/data";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { parameters as initialParameters } from "@/lib/data"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import type { Parameter } from "@/lib/types"
+
+const formSchema = z.object({
+  key: z.string().min(1, { message: "Key is required." }),
+  value: z.string().min(1, { message: "Value is required." }),
+  description: z.string().min(1, { message: "Description is required." }),
+})
 
 export function ParametersTable() {
+  const [parameters, setParameters] = useState<Parameter[]>(initialParameters);
+  const [open, setOpen] = useState(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      key: "",
+      value: "",
+      description: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    const newParameter: Parameter = {
+      id: `param_${new Date().getTime()}`,
+      ...values,
+    };
+    setParameters([newParameter, ...parameters]);
+    form.reset();
+    setOpen(false);
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -36,12 +89,73 @@ export function ParametersTable() {
                 Global variables used by your n8n workflows.
                 </CardDescription>
             </div>
-            <Button size="sm" className="gap-1">
-                <PlusCircle className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Add Parameter
-                </span>
-            </Button>
+             <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                    <Button size="sm" className="gap-1">
+                        <PlusCircle className="h-3.5 w-3.5" />
+                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                        Add Parameter
+                        </span>
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Add New Parameter</DialogTitle>
+                        <DialogDescription>
+                            Enter the details for the new global parameter.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                             <FormField
+                                control={form.control}
+                                name="key"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Key</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="e.g., API_ENDPOINT" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                <FormField
+                                control={form.control}
+                                name="value"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Value</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="e.g., https://api.example.com" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                                <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Description</FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="Describe what this parameter is used for." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                                />
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button type="button" variant="secondary">Cancel</Button>
+                                </DialogClose>
+                                <Button type="submit">Save Parameter</Button>
+                            </DialogFooter>
+                        </form>
+                    </Form>
+                </DialogContent>
+            </Dialog>
         </div>
       </CardHeader>
       <CardContent>
