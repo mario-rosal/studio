@@ -1,42 +1,11 @@
 
 "use client";
 import {
-  Bird,
-  Book,
-  Bot,
-  Code2,
-  LifeBuoy,
   Menu,
-  Mic,
-  Rabbit,
-  Settings,
-  Settings2,
-  Share,
-  SquareTerminal,
-  SquareUser,
-  Triangle,
-  Turtle,
+  LogOut,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,6 +19,7 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { AppSidebar } from "./sidebar";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { Logo } from "../icons/logo";
 
 export function Header() {
   const pathname = usePathname();
@@ -84,7 +54,8 @@ export function Header() {
             </SheetContent>
           </Sheet>
       <div className="w-full flex-1">
-        <h1 className="font-semibold text-lg">
+        <h1 className="font-semibold text-lg flex items-center gap-2">
+          <Logo className="h-6 w-6 text-primary" />
           <Link href="/">MyTaskPanel</Link>
           <span className="font-normal text-muted-foreground"> / {formattedTitle}</span>
         </h1>
