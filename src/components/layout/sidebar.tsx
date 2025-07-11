@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bot, Home, Settings, FileText } from "lucide-react";
+import { Bot, Home, Settings, FileText, ArrowRightToLine, ArrowLeftFromLine } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,8 @@ export function AppSidebar() {
   const navItems = [
     { href: "/", label: "Dashboard", icon: Home },
     { href: "/logs", label: "Logs", icon: FileText },
+    { href: "/inputs", label: "Inputs", icon: ArrowRightToLine },
+    { href: "/outputs", label: "Outputs", icon: ArrowLeftFromLine },
     { href: "/settings", label: "Settings", icon: Settings },
   ];
 
