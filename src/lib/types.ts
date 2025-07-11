@@ -30,5 +30,5 @@ export type User = {
   email: string;
   avatar: string;
   role: 'Administrator' | 'Viewer' | 'Technician';
-  status: 'Active' | 'Locked';
+  status: 'Active' | 'Locked' | 'Invited';
 };
