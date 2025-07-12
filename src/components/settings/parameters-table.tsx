@@ -1,5 +1,6 @@
+
 "use client"
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import {
   Table,
   TableBody,
@@ -32,7 +33,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog"
 import {
   AlertDialog,
@@ -45,84 +45,64 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+import { Label } from "@/components/ui/label"
 import type { Parameter } from "@/lib/types"
-
-const formSchema = z.object({
-  key: z.string().min(1, { message: "Key is required." }),
-  value: z.string().min(1, { message: "Value is required." }),
-  description: z.string().min(1, { message: "Description is required." }),
-})
-
-type ParameterFormValues = z.infer<typeof formSchema>;
+import { createParameter, updateParameter, deleteParameter } from "@/lib/actions"
+import { useToast } from "@/hooks/use-toast"
 
 interface ParametersTableProps {
     initialParameters: Parameter[];
 }
 
 export function ParametersTable({ initialParameters }: ParametersTableProps) {
+  const { toast } = useToast();
   const [parameters, setParameters] = useState<Parameter[]>(initialParameters);
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedParameter, setSelectedParameter] = useState<Parameter | null>(null);
 
-  const form = useForm<ParameterFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      key: "",
-      value: "",
-      description: "",
-    },
-  });
+  const addFormRef = useRef<HTMLFormElement>(null);
+  const editFormRef = useRef<HTMLFormElement>(null);
 
-  function handleAddSubmit(values: ParameterFormValues) {
-    const newParameter: Parameter = {
-      id: `param_${new Date().getTime()}`,
-      ...values,
-    };
-    setParameters([newParameter, ...parameters]);
-    // TODO: Add database insert logic here
-    form.reset();
-    setAddDialogOpen(false);
-  }
-
-  function handleEditSubmit(values: ParameterFormValues) {
-    if (!selectedParameter) return;
-
-    setParameters(parameters.map(p =>
-      p.id === selectedParameter.id ? { ...p, ...values } : p
-    ));
-    // TODO: Add database update logic here
-    form.reset();
-    setEditDialogOpen(false);
-    setSelectedParameter(null);
+  async function handleAddSubmit(formData: FormData) {
+    const result = await createParameter(formData);
+    if (result?.errors) {
+      // Handle errors, maybe show them in the form
+      console.error(result.errors);
+      toast({ title: "Error", description: "Please check the form for errors.", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "Parameter added successfully." });
+      setAddDialogOpen(false);
+    }
   }
 
   function openEditDialog(param: Parameter) {
     setSelectedParameter(param);
-    form.reset({
-      key: param.key,
-      value: param.value,
-      description: param.description,
-    });
     setEditDialogOpen(true);
   }
 
-  function handleDelete(paramId: string) {
-    setParameters(parameters.filter(p => p.id !== paramId));
-    // TODO: Add database delete logic here
+  async function handleEditSubmit(formData: FormData) {
+    if (!selectedParameter) return;
+    const result = await updateParameter(selectedParameter.id, formData);
+     if (result?.errors) {
+      console.error(result.errors);
+      toast({ title: "Error", description: "Please check the form for errors.", variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "Parameter updated successfully." });
+      setEditDialogOpen(false);
+      setSelectedParameter(null);
+    }
+  }
+
+  async function handleDelete(paramId: string) {
+    const result = await deleteParameter(paramId);
+    if (result?.message.includes('Error')) {
+       toast({ title: "Error", description: result.message, variant: "destructive" });
+    } else {
+       toast({ title: "Success", description: "Parameter deleted successfully." });
+    }
   }
 
   return (
@@ -132,12 +112,12 @@ export function ParametersTable({ initialParameters }: ParametersTableProps) {
             <div>
                 <CardTitle>Automation Parameters</CardTitle>
                 <CardDescription>
-                Global variables used by your n8n workflows.
+                Global variables used by your workflows.
                 </CardDescription>
             </div>
              <Dialog open={isAddDialogOpen} onOpenChange={setAddDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button size="sm" className="gap-1" onClick={() => form.reset()}>
+                    <Button size="sm" className="gap-1">
                         <PlusCircle className="h-3.5 w-3.5" />
                         <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                         Add Parameter
@@ -151,55 +131,24 @@ export function ParametersTable({ initialParameters }: ParametersTableProps) {
                             Enter the details for the new global parameter.
                         </DialogDescription>
                     </DialogHeader>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(handleAddSubmit)} className="space-y-4">
-                             <FormField
-                                control={form.control}
-                                name="key"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Key</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="e.g., API_ENDPOINT" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                <FormField
-                                control={form.control}
-                                name="value"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Value</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="e.g., https://api.example.com" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                                <FormField
-                                control={form.control}
-                                name="description"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Description</FormLabel>
-                                    <FormControl>
-                                        <Textarea placeholder="Describe what this parameter is used for." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                                />
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button type="button" variant="secondary">Cancel</Button>
-                                </DialogClose>
-                                <Button type="submit">Save Parameter</Button>
-                            </DialogFooter>
-                        </form>
-                    </Form>
+                    <form ref={addFormRef} action={handleAddSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="key">Key</Label>
+                          <Input id="key" name="key" placeholder="e.g., API_ENDPOINT" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="value">Value</Label>
+                          <Input id="value" name="value" placeholder="e.g., https://api.example.com" />
+                        </div>
+                         <div className="space-y-2">
+                          <Label htmlFor="description">Description</Label>
+                          <Textarea id="description" name="description" placeholder="Describe what this parameter is used for." />
+                        </div>
+                        <DialogFooter>
+                            <Button type="button" variant="secondary" onClick={() => setAddDialogOpen(false)}>Cancel</Button>
+                            <Button type="submit">Save Parameter</Button>
+                        </DialogFooter>
+                    </form>
                 </DialogContent>
             </Dialog>
         </div>
@@ -217,7 +166,7 @@ export function ParametersTable({ initialParameters }: ParametersTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {parameters.map((param) => (
+            {initialParameters.map((param) => (
                 <TableRow key={param.id}>
                     <TableCell className="font-mono text-sm">{param.key}</TableCell>
                     <TableCell className="font-mono text-sm">{param.value}</TableCell>
@@ -264,7 +213,7 @@ export function ParametersTable({ initialParameters }: ParametersTableProps) {
           </TableBody>
         </Table>
       </CardContent>
-      {/* Edit Dialog */}
+
       <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -273,55 +222,24 @@ export function ParametersTable({ initialParameters }: ParametersTableProps) {
                     Update the details for this global parameter.
                 </DialogDescription>
             </DialogHeader>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleEditSubmit)} className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="key"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Key</FormLabel>
-                            <FormControl>
-                                <Input placeholder="e.g., API_ENDPOINT" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                        control={form.control}
-                        name="value"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Value</FormLabel>
-                            <FormControl>
-                                <Input placeholder="e.g., https://api.example.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                        <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                                <Textarea placeholder="Describe what this parameter is used for." {...field} />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                        />
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button type="button" variant="secondary" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-                        </DialogClose>
-                        <Button type="submit">Save Changes</Button>
-                    </DialogFooter>
-                </form>
-            </Form>
+            <form ref={editFormRef} action={handleEditSubmit} className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="edit-key">Key</Label>
+                    <Input id="edit-key" name="key" defaultValue={selectedParameter?.key} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="edit-value">Value</Label>
+                    <Input id="edit-value" name="value" defaultValue={selectedParameter?.value} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="edit-description">Description</Label>
+                    <Textarea id="edit-description" name="description" defaultValue={selectedParameter?.description} />
+                </div>
+                <DialogFooter>
+                    <Button type="button" variant="secondary" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                    <Button type="submit">Save Changes</Button>
+                </DialogFooter>
+            </form>
         </DialogContent>
       </Dialog>
     </Card>

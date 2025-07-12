@@ -4,10 +4,10 @@ export type Execution = {
   status: 'Success' | 'Failure';
   timestamp: string;
   duration: number;
-  input_type: 'email' | 'pdf' | 'json' | 'database' | 'file' | 'text';
+  input_type: string;
   input_data: string;
   input_attachment?: string;
-  output_type: 'email' | 'pdf' | 'json' | 'database' | 'file' | 'text';
+  output_type: string;
   output_data: string;
   output_attachment?: string;
   logs: string;
