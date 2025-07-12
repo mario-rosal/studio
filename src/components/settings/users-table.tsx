@@ -336,10 +336,8 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
                     )}
                   />
                   <DialogFooter>
-                    <DialogClose asChild>
-                      <Button type="button" variant="secondary">Cancel</Button>
-                    </DialogClose>
-                    <Button type="submit">Save Changes</Button>
+                      <Button type="button" variant="secondary" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                      <Button type="submit">Save Changes</Button>
                   </DialogFooter>
                 </form>
               </Form>
