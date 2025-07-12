@@ -1,5 +1,4 @@
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -15,12 +14,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { executions } from "@/lib/data"
-import { ArrowUpRight } from "lucide-react"
-import Link from "next/link"
+import db from "@/lib/db"
+import type { Execution } from "@/lib/types"
 
-export function RecentIOTable() {
-  const recentExecutions = executions.slice(0, 5);
+
+async function getRecentExecutions() {
+    const result = await db.query<Execution>('SELECT * FROM executions ORDER BY timestamp DESC LIMIT 5');
+    return result.rows;
+}
+
+
+export async function RecentIOTable() {
+  const recentExecutions = await getRecentExecutions();
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
@@ -44,13 +49,13 @@ export function RecentIOTable() {
               {recentExecutions.map(exec => (
                 <TableRow key={exec.id}>
                   <TableCell>
-                    <div className="font-medium">{exec.flowName}</div>
+                    <div className="font-medium">{exec.flow_name}</div>
                     <div className="text-sm text-muted-foreground">
                       {new Date(exec.timestamp).toLocaleString()}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Badge variant="outline" className="capitalize">{exec.input.type}</Badge>
+                    <Badge variant="outline" className="capitalize">{exec.input_type}</Badge>
                   </TableCell>
                 </TableRow>
               ))}
@@ -79,7 +84,7 @@ export function RecentIOTable() {
               {recentExecutions.map(exec => (
                 <TableRow key={exec.id}>
                   <TableCell>
-                    <div className="font-medium">{exec.flowName}</div>
+                    <div className="font-medium">{exec.flow_name}</div>
                     <div className="text-sm text-muted-foreground">
                       {new Date(exec.timestamp).toLocaleString()}
                     </div>

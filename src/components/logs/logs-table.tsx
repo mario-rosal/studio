@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useTransition } from "react";
@@ -20,13 +19,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bot, Download, RefreshCw } from "lucide-react";
-import { executions as allExecutions } from "@/lib/data";
 import type { Execution } from "@/lib/types";
 import { analyzeLogs, type AnalyzeLogsOutput } from "@/ai/flows/analyze-logs";
 import { AiAnalysisView } from "./ai-analysis-view";
 
-export function LogsTable() {
-  const [executions, setExecutions] = useState<Execution[]>(allExecutions);
+interface LogsTableProps {
+    initialExecutions: Execution[];
+}
+
+export function LogsTable({ initialExecutions }: LogsTableProps) {
+  const [executions, setExecutions] = useState<Execution[]>(initialExecutions);
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<AnalyzeLogsOutput | null>(null);
   const [isAnalyzing, startTransition] = useTransition();
@@ -69,7 +71,7 @@ export function LogsTable() {
                         <span className="sr-only">Details for {execution.id}</span>
                       </AccordionTrigger>
                     </TableCell>
-                    <TableCell className="font-medium">{execution.flowName}</TableCell>
+                    <TableCell className="font-medium">{execution.flow_name}</TableCell>
                     <TableCell>
                       <Badge variant={execution.status === "Success" ? "default" : "destructive"} className={execution.status === "Success" ? 'bg-green-500' : ''}>
                         {execution.status}
@@ -86,17 +88,17 @@ export function LogsTable() {
                             <div>
                               <h4 className="font-semibold mb-2">Input</h4>
                               <div className="p-2 bg-background rounded-md text-sm">
-                                <p><strong>Type:</strong> {execution.input.type}</p>
-                                <p><strong>Data:</strong> {execution.input.data}</p>
-                                {execution.input.attachment && <Button variant="link" size="sm" className="p-0 h-auto"><Download className="mr-1 h-3 w-3" /> Download Attachment</Button>}
+                                <p><strong>Type:</strong> {execution.input_type}</p>
+                                <p><strong>Data:</strong> {execution.input_data}</p>
+                                {execution.input_attachment && <Button variant="link" size="sm" className="p-0 h-auto"><Download className="mr-1 h-3 w-3" /> Download Attachment</Button>}
                               </div>
                             </div>
                             <div>
                               <h4 className="font-semibold mb-2">Output</h4>
                               <div className="p-2 bg-background rounded-md text-sm">
-                                <p><strong>Type:</strong> {execution.output.type}</p>
-                                <p><strong>Data:</strong> {execution.output.data}</p>
-                                {execution.output.attachment && <Button variant="link" size="sm" className="p-0 h-auto"><Download className="mr-1 h-3 w-3" /> Download Attachment</Button>}
+                                <p><strong>Type:</strong> {execution.output_type}</p>
+                                <p><strong>Data:</strong> {execution.output_data}</p>
+                                {execution.output_attachment && <Button variant="link" size="sm" className="p-0 h-auto"><Download className="mr-1 h-3 w-3" /> Download Attachment</Button>}
                               </div>
                             </div>
                           </div>

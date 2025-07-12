@@ -6,21 +6,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { executions } from '@/lib/data';
+import type { Execution } from '@/lib/types';
 
-export function InputsTable() {
+interface InputsTableProps {
+    initialExecutions: Execution[];
+    inputTypes: string[];
+}
+
+export function InputsTable({ initialExecutions, inputTypes }: InputsTableProps) {
   const [flowNameFilter, setFlowNameFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
 
   const filteredInputs = useMemo(() => {
-    return executions.filter(exec => {
-      const flowNameMatch = exec.flowName.toLowerCase().includes(flowNameFilter.toLowerCase());
-      const typeMatch = typeFilter === 'all' || exec.input.type === typeFilter;
+    return initialExecutions.filter(exec => {
+      const flowNameMatch = exec.flow_name.toLowerCase().includes(flowNameFilter.toLowerCase());
+      const typeMatch = typeFilter === 'all' || exec.input_type === typeFilter;
       return flowNameMatch && typeMatch;
     });
-  }, [flowNameFilter, typeFilter]);
-  
-  const inputTypes = useMemo(() => ['all', ...Array.from(new Set(executions.map(e => e.input.type)))], []);
+  }, [initialExecutions, flowNameFilter, typeFilter]);
 
   return (
     <Card>
@@ -62,12 +65,12 @@ export function InputsTable() {
             {filteredInputs.length > 0 ? (
                 filteredInputs.map(exec => (
                 <TableRow key={exec.id}>
-                  <TableCell className="font-medium">{exec.flowName}</TableCell>
+                  <TableCell className="font-medium">{exec.flow_name}</TableCell>
                   <TableCell>{new Date(exec.timestamp).toLocaleString()}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="capitalize">{exec.input.type}</Badge>
+                    <Badge variant="outline" className="capitalize">{exec.input_type}</Badge>
                   </TableCell>
-                  <TableCell className="font-mono text-xs">{exec.input.data}</TableCell>
+                  <TableCell className="font-mono text-xs">{exec.input_data}</TableCell>
                 </TableRow>
               ))
             ) : (

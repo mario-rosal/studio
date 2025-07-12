@@ -6,21 +6,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { executions } from '@/lib/data';
+import type { Execution } from '@/lib/types';
 
-export function OutputsTable() {
+interface OutputsTableProps {
+    initialExecutions: Execution[];
+    statuses: string[];
+}
+
+export function OutputsTable({ initialExecutions, statuses }: OutputsTableProps) {
   const [flowNameFilter, setFlowNameFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
   const filteredOutputs = useMemo(() => {
-    return executions.filter(exec => {
-      const flowNameMatch = exec.flowName.toLowerCase().includes(flowNameFilter.toLowerCase());
+    return initialExecutions.filter(exec => {
+      const flowNameMatch = exec.flow_name.toLowerCase().includes(flowNameFilter.toLowerCase());
       const statusMatch = statusFilter === 'all' || exec.status === statusFilter;
       return flowNameMatch && statusMatch;
     });
-  }, [flowNameFilter, statusFilter]);
-  
-  const statuses = useMemo(() => ['all', ...Array.from(new Set(executions.map(e => e.status)))], []);
+  }, [initialExecutions, flowNameFilter, statusFilter]);
 
   return (
     <Card>
@@ -63,7 +66,7 @@ export function OutputsTable() {
             {filteredOutputs.length > 0 ? (
                 filteredOutputs.map(exec => (
                 <TableRow key={exec.id}>
-                  <TableCell className="font-medium">{exec.flowName}</TableCell>
+                  <TableCell className="font-medium">{exec.flow_name}</TableCell>
                   <TableCell>{new Date(exec.timestamp).toLocaleString()}</TableCell>
                   <TableCell>
                     <Badge variant={exec.status === 'Success' ? 'default' : 'destructive'} className={exec.status === 'Success' ? 'bg-green-500' : ''}>
@@ -71,9 +74,9 @@ export function OutputsTable() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="capitalize">{exec.output.type}</Badge>
+                    <Badge variant="outline" className="capitalize">{exec.output_type}</Badge>
                   </TableCell>
-                  <TableCell className="font-mono text-xs">{exec.output.data}</TableCell>
+                  <TableCell className="font-mono text-xs">{exec.output_data}</TableCell>
                 </TableRow>
               ))
             ) : (

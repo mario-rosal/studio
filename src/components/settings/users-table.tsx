@@ -25,7 +25,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { users as initialUsers } from "@/lib/data"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Badge } from "../ui/badge"
 import {
@@ -87,7 +86,11 @@ const editFormSchema = z.object({
 
 type EditFormValues = z.infer<typeof editFormSchema>;
 
-export function UsersTable() {
+interface UsersTableProps {
+    initialUsers: User[];
+}
+
+export function UsersTable({ initialUsers }: UsersTableProps) {
   const [users, setUsers] = useState<User[]>(initialUsers)
   const [isInviteDialogOpen, setInviteDialogOpen] = useState(false)
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
@@ -114,6 +117,7 @@ export function UsersTable() {
       status: "Invited",
     }
     setUsers([newUser, ...users])
+    // TODO: Add database insert logic here
     inviteForm.reset()
     setInviteDialogOpen(false)
   }
@@ -127,6 +131,7 @@ export function UsersTable() {
   function handleEditSubmit(values: EditFormValues) {
     if (!selectedUser) return;
     setUsers(users.map(u => u.id === selectedUser.id ? { ...u, role: values.role } : u));
+    // TODO: Add database update logic here
     setEditDialogOpen(false);
     setSelectedUser(null);
   }
@@ -134,6 +139,7 @@ export function UsersTable() {
   function handleToggleLock(userId: string) {
     setUsers(users.map(u => {
       if (u.id === userId) {
+        // TODO: Add database update logic here for status
         return { ...u, status: u.status === 'Active' ? 'Locked' : 'Active' };
       }
       return u;
@@ -142,6 +148,7 @@ export function UsersTable() {
 
   function handleDeleteUser(userId: string) {
     setUsers(users.filter(u => u.id !== userId));
+    // TODO: Add database delete logic here
   }
 
   return (
@@ -196,7 +203,7 @@ export function UsersTable() {
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select a role" />
-                              </SelectTrigger>
+                              </Trigger>
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="Administrator">Administrator</SelectItem>
@@ -316,7 +323,7 @@ export function UsersTable() {
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a role" />
-                            </SelectTrigger>
+                            </Trigger>
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="Administrator">Administrator</SelectItem>

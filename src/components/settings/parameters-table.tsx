@@ -55,7 +55,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { parameters as initialParameters } from "@/lib/data"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -69,7 +68,11 @@ const formSchema = z.object({
 
 type ParameterFormValues = z.infer<typeof formSchema>;
 
-export function ParametersTable() {
+interface ParametersTableProps {
+    initialParameters: Parameter[];
+}
+
+export function ParametersTable({ initialParameters }: ParametersTableProps) {
   const [parameters, setParameters] = useState<Parameter[]>(initialParameters);
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
@@ -90,6 +93,7 @@ export function ParametersTable() {
       ...values,
     };
     setParameters([newParameter, ...parameters]);
+    // TODO: Add database insert logic here
     form.reset();
     setAddDialogOpen(false);
   }
@@ -100,6 +104,7 @@ export function ParametersTable() {
     setParameters(parameters.map(p =>
       p.id === selectedParameter.id ? { ...p, ...values } : p
     ));
+    // TODO: Add database update logic here
     form.reset();
     setEditDialogOpen(false);
     setSelectedParameter(null);
@@ -117,6 +122,7 @@ export function ParametersTable() {
 
   function handleDelete(paramId: string) {
     setParameters(parameters.filter(p => p.id !== paramId));
+    // TODO: Add database delete logic here
   }
 
   return (
