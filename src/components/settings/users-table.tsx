@@ -55,7 +55,7 @@ import { createUser, updateUserRole, deleteUser } from "@/lib/actions"
 import { useToast } from "@/hooks/use-toast"
 
 interface UsersTableProps {
-    users: User[];
+    initialUsers: User[];
 }
 
 const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } = {
@@ -64,7 +64,7 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
   Locked: "destructive",
 };
 
-export function UsersTable({ users }: UsersTableProps) {
+export function UsersTable({ initialUsers }: UsersTableProps) {
   const { toast } = useToast();
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
@@ -178,7 +178,7 @@ export function UsersTable({ users }: UsersTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {initialUsers.map((user) => (
                 <TableRow key={user.id}>
                     <TableCell className="font-medium flex items-center gap-3">
                         <Image src={user.avatar} alt={user.name} width={40} height={40} className="rounded-full" />
