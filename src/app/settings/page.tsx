@@ -25,7 +25,7 @@ export default async function SettingsPage() {
         <TabsTrigger value="users">Users & Roles</TabsTrigger>
       </TabsList>
       <TabsContent value="parameters">
-        <ParametersTable initialParameters={parameters} />
+        <ParametersTable parameters={parameters} />
       </TabsContent>
       <TabsContent value="users">
         <UsersTable initialUsers={users} />

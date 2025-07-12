@@ -53,10 +53,10 @@ import { createParameter, updateParameter, deleteParameter } from "@/lib/actions
 import { useToast } from "@/hooks/use-toast"
 
 interface ParametersTableProps {
-    initialParameters: Parameter[];
+    parameters: Parameter[];
 }
 
-export function ParametersTable({ initialParameters }: ParametersTableProps) {
+export function ParametersTable({ parameters }: ParametersTableProps) {
   const { toast } = useToast();
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
@@ -161,7 +161,7 @@ export function ParametersTable({ initialParameters }: ParametersTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {initialParameters.map((param) => (
+            {parameters.map((param) => (
                 <TableRow key={param.id}>
                     <TableCell className="font-mono text-sm">{param.key}</TableCell>
                     <TableCell className="font-mono text-sm">{param.value}</TableCell>
