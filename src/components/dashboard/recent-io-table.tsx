@@ -14,18 +14,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import db from "@/lib/db"
-import type { Execution } from "@/lib/types"
+import { executions } from "@/lib/data"
 
 
-async function getRecentExecutions() {
-    const result = await db.query<Execution>('SELECT * FROM executions ORDER BY timestamp DESC LIMIT 5');
-    return result.rows;
-}
+const recentExecutions = [...executions].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
 
-
-export async function RecentIOTable() {
-  const recentExecutions = await getRecentExecutions();
+export function RecentIOTable() {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <Card>

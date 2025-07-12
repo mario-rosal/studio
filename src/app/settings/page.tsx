@@ -1,23 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ParametersTable } from "@/components/settings/parameters-table";
 import { UsersTable } from "@/components/settings/users-table";
-import db from "@/lib/db";
-import type { Parameter, User } from "@/lib/types";
+import { parameters, users } from "@/lib/data";
 
-async function getParameters() {
-    const result = await db.query<Parameter>('SELECT * FROM parameters ORDER BY key');
-    return result.rows;
-}
-
-async function getUsers() {
-    const result = await db.query<User>('SELECT * FROM users ORDER BY name');
-    return result.rows;
-}
-
-export default async function SettingsPage() {
-  const parameters = await getParameters();
-  const users = await getUsers();
-
+export default function SettingsPage() {
   return (
     <Tabs defaultValue="parameters">
       <TabsList className="grid w-full grid-cols-2 md:w-[400px]">

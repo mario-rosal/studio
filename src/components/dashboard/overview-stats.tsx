@@ -1,30 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Clock, AlertCircle, CheckCircle } from "lucide-react";
-import db from '@/lib/db';
-import type { Execution } from "@/lib/types";
+import { executions } from "@/lib/data";
 
-async function getExecutionStats() {
-    const result = await db.query(`
-        SELECT
-            COUNT(*) AS total_executions,
-            COUNT(CASE WHEN status = 'Success' THEN 1 END) AS successful_executions,
-            AVG(duration) as average_duration,
-            MAX(timestamp) as last_execution
-        FROM executions
-    `);
-    const stats = result.rows[0];
-    return {
-        totalExecutions: Number(stats.total_executions) || 0,
-        successfulExecutions: Number(stats.successful_executions) || 0,
-        failedExecutions: (Number(stats.total_executions) || 0) - (Number(stats.successful_executions) || 0),
-        averageDuration: (Number(stats.average_duration) || 0).toFixed(2),
-        lastExecution: stats.last_execution ? new Date(stats.last_execution) : null,
-    };
-}
-
-
-export async function OverviewStats() {
-  const { totalExecutions, successfulExecutions, failedExecutions, averageDuration, lastExecution } = await getExecutionStats();
+export function OverviewStats() {
+  const totalExecutions = executions.length;
+  const successfulExecutions = executions.filter(e => e.status === 'Success').length;
+  const failedExecutions = totalExecutions - successfulExecutions;
+  const averageDuration = (executions.reduce((acc, e) => acc + e.duration, 0) / totalExecutions).toFixed(2);
+  const lastExecution = executions.length > 0 ? new Date(Math.max(...executions.map(e => new Date(e.timestamp).getTime()))) : null;
 
   const stats = [
     {
