@@ -24,11 +24,13 @@ export async function createParameter(formData: FormData) {
             errors: validatedFields.error.flatten().fieldErrors,
         };
     }
+    
+    const id = randomUUID();
 
     try {
         await db.query(
-            'INSERT INTO parameters (key, value, description) VALUES ($1, $2, $3)',
-            [validatedFields.data.key, validatedFields.data.value, validatedFields.data.description]
+            'INSERT INTO parameters (id, key, value, description) VALUES ($1, $2, $3, $4)',
+            [id, validatedFields.data.key, validatedFields.data.value, validatedFields.data.description]
         );
         revalidatePath('/settings');
         return { message: 'Parameter created successfully.' };
