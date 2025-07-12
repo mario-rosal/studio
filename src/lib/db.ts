@@ -6,17 +6,14 @@ if (!process.env.DATABASE_URL) {
 
 let pool: Pool;
 
-// Check if we are in a production environment
+// Using a global object to persist the connection pool across hot reloads in development.
+// This prevents creating a new pool on every change.
 if (process.env.NODE_ENV === 'production') {
   pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false,
-    },
   });
 } else {
-  // In development, we might have a global object to persist the connection across hot reloads
-  if (!global.hasOwnProperty('dbPool')) {
+  if (!(global as any).dbPool) {
     (global as any).dbPool = new Pool({
       connectionString: process.env.DATABASE_URL,
     });
