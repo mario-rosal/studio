@@ -1,6 +1,6 @@
 
 "use client"
-import React, { useState, useRef } from "react"
+import React, { useState } from "react"
 import {
   Table,
   TableBody,
@@ -58,18 +58,13 @@ interface ParametersTableProps {
 
 export function ParametersTable({ initialParameters }: ParametersTableProps) {
   const { toast } = useToast();
-  const [parameters, setParameters] = useState<Parameter[]>(initialParameters);
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedParameter, setSelectedParameter] = useState<Parameter | null>(null);
 
-  const addFormRef = useRef<HTMLFormElement>(null);
-  const editFormRef = useRef<HTMLFormElement>(null);
-
-  async function handleAddSubmit(formData: FormData) {
+  async function handleAddFormAction(formData: FormData) {
     const result = await createParameter(formData);
     if (result?.errors) {
-      // Handle errors, maybe show them in the form
       console.error(result.errors);
       toast({ title: "Error", description: "Please check the form for errors.", variant: "destructive" });
     } else {
@@ -83,7 +78,7 @@ export function ParametersTable({ initialParameters }: ParametersTableProps) {
     setEditDialogOpen(true);
   }
 
-  async function handleEditSubmit(formData: FormData) {
+  async function handleEditFormAction(formData: FormData) {
     if (!selectedParameter) return;
     const result = await updateParameter(selectedParameter.id, formData);
      if (result?.errors) {
@@ -131,7 +126,7 @@ export function ParametersTable({ initialParameters }: ParametersTableProps) {
                             Enter the details for the new global parameter.
                         </DialogDescription>
                     </DialogHeader>
-                    <form ref={addFormRef} action={handleAddSubmit} className="space-y-4">
+                    <form action={handleAddFormAction} className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="key">Key</Label>
                           <Input id="key" name="key" placeholder="e.g., API_ENDPOINT" />
@@ -222,7 +217,7 @@ export function ParametersTable({ initialParameters }: ParametersTableProps) {
                     Update the details for this global parameter.
                 </DialogDescription>
             </DialogHeader>
-            <form ref={editFormRef} action={handleEditSubmit} className="space-y-4">
+            <form action={handleEditFormAction} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="edit-key">Key</Label>
                     <Input id="edit-key" name="key" defaultValue={selectedParameter?.key} />
