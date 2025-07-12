@@ -55,7 +55,7 @@ import { createUser, updateUserRole, deleteUser } from "@/lib/actions"
 import { useToast } from "@/hooks/use-toast"
 
 interface UsersTableProps {
-    initialUsers: User[];
+    users: User[];
 }
 
 const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } = {
@@ -64,7 +64,7 @@ const statusVariant: { [key: string]: "default" | "secondary" | "destructive" } 
   Locked: "destructive",
 };
 
-export function UsersTable({ initialUsers }: UsersTableProps) {
+export function UsersTable({ users }: UsersTableProps) {
   const { toast } = useToast();
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
@@ -137,15 +137,15 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
                     <form action={handleAddSubmit} className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="name">Name</Label>
-                          <Input id="name" name="name" placeholder="e.g., John Doe" />
+                          <Input id="name" name="name" placeholder="e.g., John Doe" required />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="email">Email</Label>
-                          <Input id="email" name="email" type="email" placeholder="e.g., john@example.com" />
+                          <Input id="email" name="email" type="email" placeholder="e.g., john@example.com" required />
                         </div>
                          <div className="space-y-2">
                           <Label htmlFor="role">Role</Label>
-                          <Select name="role" defaultValue="Technician">
+                          <Select name="role" defaultValue="Technician" required>
                             <SelectTrigger id="role">
                                 <SelectValue placeholder="Select a role" />
                             </SelectTrigger>
@@ -178,7 +178,7 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {initialUsers.map((user) => (
+            {users.map((user) => (
                 <TableRow key={user.id}>
                     <TableCell className="font-medium flex items-center gap-3">
                         <Image src={user.avatar} alt={user.name} width={40} height={40} className="rounded-full" />
