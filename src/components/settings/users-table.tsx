@@ -323,7 +323,7 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a role" />
-                            </Trigger>
+                            </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="Administrator">Administrator</SelectItem>
