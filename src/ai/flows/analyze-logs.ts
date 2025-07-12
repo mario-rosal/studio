@@ -20,6 +20,7 @@ const AnalyzeLogsOutputSchema = z.object({
   summary: z.string().describe('A summarized analysis of the execution logs.'),
   insights: z.string().describe('Insights and potential issues identified in the logs.'),
   recommendations: z.string().describe('Recommendations to improve workflow performance based on the log analysis.'),
+  tokensUsed: z.number().describe('The number of tokens used for the analysis.'),
 });
 export type AnalyzeLogsOutput = z.infer<typeof AnalyzeLogsOutputSchema>;
 
@@ -30,7 +31,7 @@ export async function analyzeLogs(input: AnalyzeLogsInput): Promise<AnalyzeLogsO
 const analyzeLogsPrompt = ai.definePrompt({
   name: 'analyzeLogsPrompt',
   input: {schema: AnalyzeLogsInputSchema},
-  output: {schema: AnalyzeLogsOutputSchema},
+  output: {schema: AnalyzeLogsOutputSchema.omit({ tokensUsed: true })},
   prompt: `You are an AI expert specializing in analyzing execution logs for automation workflows.
 
 You will use the provided logs to identify potential issues, summarize the overall performance, and provide recommendations for improvement.
@@ -53,7 +54,14 @@ const analyzeLogsFlow = ai.defineFlow(
     outputSchema: AnalyzeLogsOutputSchema,
   },
   async input => {
-    const {output} = await analyzeLogsPrompt(input);
-    return output!;
+    const response = await analyzeLogsPrompt(input);
+    const output = response.output;
+    if (!output) {
+      throw new Error("No output from AI analysis");
+    }
+    return {
+      ...output,
+      tokensUsed: response.usage?.totalTokens ?? 0
+    };
   }
 );

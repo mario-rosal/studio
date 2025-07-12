@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, Clock, AlertCircle, CheckCircle } from "lucide-react";
+import { Activity, Clock, AlertCircle, CheckCircle, Cpu } from "lucide-react";
 import type { Execution } from "@/lib/types";
 
 interface OverviewStatsProps {
@@ -11,6 +11,7 @@ export function OverviewStats({ executions }: OverviewStatsProps) {
   const successfulExecutions = executions.filter(e => e.status === 'Success').length;
   const failedExecutions = totalExecutions - successfulExecutions;
   const averageDuration = totalExecutions > 0 ? (executions.reduce((acc, e) => acc + e.duration, 0) / totalExecutions).toFixed(2) : '0.00';
+  const totalTokens = executions.reduce((acc, e) => acc + (e.tokens_used || 0), 0);
   const lastExecution = executions.length > 0 ? new Date(Math.max(...executions.map(e => new Date(e.timestamp).getTime()))) : null;
 
   const stats = [
@@ -38,10 +39,16 @@ export function OverviewStats({ executions }: OverviewStatsProps) {
       icon: Clock,
       color: "text-amber-500",
     },
+    {
+      title: "Tokens Used",
+      value: totalTokens.toLocaleString(),
+      icon: Cpu,
+      color: "text-violet-500",
+    }
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
       {stats.map((stat) => (
         <Card key={stat.title}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -53,6 +60,11 @@ export function OverviewStats({ executions }: OverviewStatsProps) {
             {stat.title === 'Total Executions' && lastExecution && (
               <p className="text-xs text-muted-foreground">
                 Last run: {lastExecution.toLocaleTimeString()}
+              </p>
+            )}
+             {stat.title === 'Tokens Used' && (
+              <p className="text-xs text-muted-foreground">
+                In total across all executions
               </p>
             )}
           </CardContent>

@@ -11,6 +11,7 @@ export type Execution = {
   output_data: string;
   output_attachment?: string;
   logs: string;
+  tokens_used?: number;
 };
 
 export type Parameter = {
