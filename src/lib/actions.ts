@@ -4,6 +4,7 @@
 import { z } from 'zod';
 import db from './db';
 import { revalidatePath } from 'next/cache';
+import { randomUUID } from 'crypto';
 
 const parameterSchema = z.object({
     key: z.string().min(1, 'Key is required.'),
@@ -90,18 +91,19 @@ export async function createUser(formData: FormData) {
         };
     }
     
-    // For now, we'll use a placeholder avatar and active status
+    const id = randomUUID();
     const avatar = `https://i.pravatar.cc/150?u=${validatedFields.data.email}`;
     const status = 'Active';
 
     try {
         await db.query(
-            'INSERT INTO users (name, email, role, avatar, status) VALUES ($1, $2, $3, $4, $5)',
-            [validatedFields.data.name, validatedFields.data.email, validatedFields.data.role, avatar, status]
+            'INSERT INTO users (id, name, email, role, avatar, status) VALUES ($1, $2, $3, $4, $5, $6)',
+            [id, validatedFields.data.name, validatedFields.data.email, validatedFields.data.role, avatar, status]
         );
         revalidatePath('/settings');
         return { message: 'User created successfully.' };
     } catch (error) {
+        console.error('Database Error:', error);
         return { message: 'Database Error: Failed to Create User.' };
     }
 }
