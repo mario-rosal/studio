@@ -5,12 +5,12 @@ export type Execution = {
   timestamp: string;
   duration: number;
   input: {
-    type: 'email' | 'pdf' | 'json';
+    type: 'email' | 'pdf' | 'json' | 'database' | 'file' | 'text';
     data: string;
     attachment?: string;
   };
   output: {
-    type: 'email' | 'database' | 'file';
+    type: 'email' | 'pdf' | 'json' | 'database' | 'file' | 'text';
     data: string;
     attachment?: string;
   };
