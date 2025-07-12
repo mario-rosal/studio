@@ -1,12 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Clock, AlertCircle, CheckCircle } from "lucide-react";
-import { executions } from "@/lib/data";
+import type { Execution } from "@/lib/types";
 
-export function OverviewStats() {
+interface OverviewStatsProps {
+  executions: Execution[];
+}
+
+export function OverviewStats({ executions }: OverviewStatsProps) {
   const totalExecutions = executions.length;
   const successfulExecutions = executions.filter(e => e.status === 'Success').length;
   const failedExecutions = totalExecutions - successfulExecutions;
-  const averageDuration = (executions.reduce((acc, e) => acc + e.duration, 0) / totalExecutions).toFixed(2);
+  const averageDuration = totalExecutions > 0 ? (executions.reduce((acc, e) => acc + e.duration, 0) / totalExecutions).toFixed(2) : '0.00';
   const lastExecution = executions.length > 0 ? new Date(Math.max(...executions.map(e => new Date(e.timestamp).getTime()))) : null;
 
   const stats = [

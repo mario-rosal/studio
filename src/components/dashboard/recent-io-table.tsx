@@ -14,12 +14,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { executions } from "@/lib/data"
+import type { Execution } from "@/lib/types";
 
+interface RecentIOTableProps {
+  executions: Execution[];
+}
 
-const recentExecutions = [...executions].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
+export function RecentIOTable({ executions }: RecentIOTableProps) {
+  const recentExecutions = [...executions].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 5);
 
-export function RecentIOTable() {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <Card>

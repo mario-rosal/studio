@@ -14,16 +14,19 @@ interface UsersTableProps {
 }
 
 export function UsersTable({ initialUsers }: UsersTableProps) {
+  // Since we reset this file, the full user management UI is not here.
+  // We can rebuild it step-by-step. For now, it just shows a placeholder.
   return (
     <Card>
       <CardHeader>
         <CardTitle>User Management</CardTitle>
         <CardDescription>
-          Manage access to the MyTaskPanel dashboard.
+          Manage access to the MyTaskPanel dashboard. This section is under construction.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p>This section is under construction.</p>
+        <p>Displaying {initialUsers.length} user(s) from the database.</p>
+        {/* We will rebuild the table and form functionality here in the next steps. */}
       </CardContent>
     </Card>
   )

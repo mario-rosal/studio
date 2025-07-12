@@ -1,7 +1,17 @@
 import { InputsTable } from "@/components/inputs/inputs-table";
-import { executions } from "@/lib/data";
+import db from '@/lib/db';
+import type { Execution } from "@/lib/types";
 
-export default function InputsPage() {
+async function getExecutions(): Promise<Execution[]> {
+    const result = await db.query('SELECT * FROM executions ORDER BY timestamp DESC');
+    return result.rows.map(row => ({
+        ...row,
+        timestamp: new Date(row.timestamp).toISOString(),
+    }));
+}
+
+export default async function InputsPage() {
+  const executions = await getExecutions();
   const inputTypes = ['all', ...Array.from(new Set(executions.map(e => e.input_type)))];
 
   return (
