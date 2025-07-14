@@ -1,8 +1,7 @@
-
-"use client";
+import Link from "next/link";
+import { cookies } from "next/headers";
 import {
   Menu,
-  LogOut,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -16,24 +15,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
-import { AppSidebar } from "./sidebar";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+import { AppSidebar, AppSidebarContent } from "./sidebar";
 import { Logo } from "../icons/logo";
+import { logout } from "@/lib/actions";
+import { PageTitle } from "./page-title";
+
+
+function getSession() {
+  const sessionCookie = cookies().get("auth_session")?.value;
+  if (!sessionCookie) return null;
+  try {
+    return JSON.parse(sessionCookie);
+  } catch (error) {
+    console.error("Failed to parse session cookie:", error);
+    return null;
+  }
+}
+
 
 export function Header() {
-  const pathname = usePathname();
-  const pageTitle = pathname.split('/').filter(Boolean).pop() || 'Dashboard';
-  const formattedTitle = pageTitle.charAt(0).toUpperCase() + pageTitle.slice(1);
+  const session = getSession();
 
   const handleSupportClick = () => {
     window.location.href = "mailto:support@n8npilot.com";
   };
-
-  const handleLogout = () => {
-    console.log("Logout action triggered");
-  };
-
+  
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
        <Sheet>
@@ -49,38 +55,40 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col p-0">
               <div className="bg-sidebar text-sidebar-foreground h-full">
-                <AppSidebar />
+                <AppSidebarContent session={session} />
               </div>
             </SheetContent>
           </Sheet>
       <div className="w-full flex-1">
-        <h1 className="font-semibold text-lg flex items-center gap-2">
-          <Logo className="h-6 w-6" />
-          <Link href="/">n8nPilot</Link>
-          <span className="font-normal text-muted-foreground"> / {formattedTitle}</span>
-        </h1>
+        <PageTitle />
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="secondary" size="icon" className="rounded-full">
-            <Avatar>
-              <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="@shadcn" />
-              <AvatarFallback>A</AvatarFallback>
-            </Avatar>
-            <span className="sr-only">Toggle user menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <Link href="/settings" passHref>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-          </Link>
-          <DropdownMenuItem onSelect={handleSupportClick}>Support</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={handleLogout}>Logout</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {session && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="secondary" size="icon" className="rounded-full">
+              <Avatar>
+                <AvatarImage src={session.avatar} alt={session.name} />
+                <AvatarFallback>{session.name?.charAt(0) || 'U'}</AvatarFallback>
+              </Avatar>
+              <span className="sr-only">Toggle user menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>{session.name}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <Link href="/settings" passHref>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+            </Link>
+             <DropdownMenuItem onSelect={handleSupportClick}>Support</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <form action={logout}>
+              <DropdownMenuItem asChild>
+                 <button type="submit" className="w-full text-left">Logout</button>
+              </DropdownMenuItem>
+            </form>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </header>
   );
 }

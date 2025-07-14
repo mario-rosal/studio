@@ -81,7 +81,7 @@ export async function login(formData: FormData) {
             throw new Error('Invalid email or password.');
         }
         
-        const sessionData = { id: user.id, name: user.name, email: user.email, role: user.role };
+        const sessionData = { id: user.id, name: user.name, email: user.email, role: user.role, avatar: user.avatar };
         cookies().set('auth_session', JSON.stringify(sessionData), {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
@@ -98,6 +98,11 @@ export async function login(formData: FormData) {
     }
 
     redirect('/dashboard');
+}
+
+export async function logout() {
+  cookies().delete('auth_session');
+  redirect('/login');
 }
 
 
