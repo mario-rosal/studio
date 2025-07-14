@@ -61,7 +61,9 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required.'),
 });
 
-const key = new TextEncoder().encode(process.env.SESSION_SECRET);
+// IMPORTANT: Hardcoding the secret for debugging to match middleware.
+// This is NOT recommended for production.
+const key = new TextEncoder().encode("e9b7a3e7-3e6e-4f7a-8f4b-2d3e1c5f7a9d");
 
 export async function login(formData: FormData) {
     const validatedFields = loginSchema.safeParse(Object.fromEntries(formData.entries()));
