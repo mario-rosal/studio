@@ -181,7 +181,7 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
             {initialUsers.map((user) => (
                 <TableRow key={user.id}>
                     <TableCell className="font-medium flex items-center gap-3">
-                        <Image src={user.avatar} alt={user.name} width={40} height={40} className="rounded-full" />
+                        <Image src={user.avatar || 'https://placehold.co/40x40.png'} alt={user.name} width={40} height={40} className="rounded-full" />
                         <div>
                             <div>{user.name}</div>
                             <div className="text-sm text-muted-foreground">{user.email}</div>
