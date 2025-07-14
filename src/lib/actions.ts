@@ -5,7 +5,91 @@ import { z } from 'zod';
 import db from './db';
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
+import bcrypt from 'bcrypt';
 
+// --- Authentication Actions ---
+
+const signupSchema = z.object({
+    name: z.string().min(2, 'Name must be at least 2 characters.'),
+    email: z.string().email('Invalid email address.'),
+    password: z.string().min(6, 'Password must be at least 6 characters.'),
+});
+
+export async function signup(formData: FormData) {
+    const validatedFields = signupSchema.safeParse(Object.fromEntries(formData.entries()));
+
+    if (!validatedFields.success) {
+        return {
+            success: false,
+            errors: validatedFields.error.flatten().fieldErrors,
+        };
+    }
+
+    const { name, email, password } = validatedFields.data;
+
+    try {
+        const existingUser = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (existingUser.rows.length > 0) {
+            return { success: false, error: 'An account with this email already exists.' };
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const id = randomUUID();
+        const avatar = `https://i.pravatar.cc/150?u=${email}`;
+        
+        await db.query(
+            'INSERT INTO users (id, name, email, password, role, status, avatar) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+            [id, name, email, hashedPassword, 'Technician', 'Active', avatar]
+        );
+        
+        return { success: true };
+
+    } catch (error) {
+        console.error('Signup Error:', error);
+        return { success: false, error: 'Database Error: Failed to create user.' };
+    }
+}
+
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
+
+export async function login(formData: FormData) {
+    const validatedFields = loginSchema.safeParse(Object.fromEntries(formData.entries()));
+
+    if (!validatedFields.success) {
+        return { success: false, error: 'Invalid email or password.' };
+    }
+    
+    const { email, password } = validatedFields.data;
+
+    try {
+        const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (result.rows.length === 0) {
+            return { success: false, error: 'Invalid email or password.' };
+        }
+
+        const user = result.rows[0];
+        const passwordsMatch = await bcrypt.compare(password, user.password);
+
+        if (!passwordsMatch) {
+            return { success: false, error: 'Invalid email or password.' };
+        }
+        
+        // In a real app, you would set a session cookie here.
+        // For this demo, we'll just return success.
+        return { success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
+
+    } catch (error) {
+        console.error('Login Error:', error);
+        return { success: false, error: 'Database Error: Failed to log in.' };
+    }
+}
+
+
+// --- Parameter Actions ---
 const parameterSchema = z.object({
     key: z.string().min(1, 'Key is required.'),
     value: z.string().min(1, 'Value is required.'),
@@ -74,6 +158,8 @@ export async function deleteParameter(id: string) {
     }
 }
 
+
+// --- User Actions ---
 const userSchema = z.object({
     name: z.string().min(1, 'Name is required.'),
     email: z.string().email('Invalid email address.'),

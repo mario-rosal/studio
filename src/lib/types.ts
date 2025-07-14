@@ -28,4 +28,5 @@ export type User = {
   avatar: string;
   role: 'Administrator' | 'Viewer' | 'Technician';
   status: 'Active' | 'Locked' | 'Invited';
+  password?: string;
 };
