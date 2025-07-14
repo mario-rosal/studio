@@ -2,10 +2,12 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const SECRET_KEY = process.env.SESSION_SECRET;
+// IMPORTANT: Hardcoding the secret for debugging.
+// This is NOT recommended for production.
+const SECRET_KEY = "e9b7a3e7-3e6e-4f7a-8f4b-2d3e1c5f7a9d";
 
 export async function middleware(request: NextRequest) {
-  console.log('SESSION_SECRET available in middleware:', process.env.SESSION_SECRET);
+  console.log('SESSION_SECRET available in middleware:', SECRET_KEY);
   console.log('Cookies received:', request.cookies.getAll());
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get('session')?.value;
