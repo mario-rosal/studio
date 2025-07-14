@@ -27,7 +27,7 @@ export function Header() {
   const formattedTitle = pageTitle.charAt(0).toUpperCase() + pageTitle.slice(1);
 
   const handleSupportClick = () => {
-    window.location.href = "mailto:support@mytaskpanel.com";
+    window.location.href = "mailto:support@n8npilot.com";
   };
 
   const handleLogout = () => {
@@ -56,7 +56,7 @@ export function Header() {
       <div className="w-full flex-1">
         <h1 className="font-semibold text-lg flex items-center gap-2">
           <Logo className="h-6 w-6" />
-          <Link href="/">MyTaskPanel</Link>
+          <Link href="/">n8nPilot</Link>
           <span className="font-normal text-muted-foreground"> / {formattedTitle}</span>
         </h1>
       </div>

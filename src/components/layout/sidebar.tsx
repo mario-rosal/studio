@@ -14,7 +14,7 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/", label: "Dashboard", icon: Home },
+    { href: "/dashboard", label: "Dashboard", icon: Home },
     { href: "/logs", label: "Logs", icon: FileText },
     { href: "/inputs", label: "Inputs", icon: ArrowRightToLine },
     { href: "/outputs", label: "Outputs", icon: ArrowLeftFromLine },
@@ -27,7 +27,7 @@ export function AppSidebar() {
         <div className="flex h-14 items-center border-b border-sidebar-border px-4 lg:h-[60px] lg:px-6">
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <Logo className="h-6 w-6" />
-            <span className="">MyTaskPanel</span>
+            <span className="">n8nPilot</span>
           </Link>
         </div>
         <div className="flex-1">
