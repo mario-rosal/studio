@@ -23,6 +23,11 @@ export default function LoginPage() {
       await login(formData);
       // Redirect is handled by the server action
     } catch (e: any) {
+       // The redirect() function in a server action throws a NEXT_REDIRECT error.
+       // We want to ignore this specific error and let the redirect happen.
+       if (e.message.includes('NEXT_REDIRECT')) {
+         return;
+       }
        const errorMessage = e.message || "An unknown error occurred";
        setError(errorMessage);
        toast({

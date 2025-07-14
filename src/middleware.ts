@@ -7,12 +7,12 @@ const isAuthenticated = (request: NextRequest) => {
  
 export function middleware(request: NextRequest) {
   const isAuth = isAuthenticated(request);
-  const { pathname } = request.nextUrl
+  const { pathname } = request.nextUrl;
 
   const publicRoutes = ['/login', '/signup'];
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
-  // If the user is authenticated and trying to access a public route (like login),
+  // If the user is authenticated and trying to access a public route (like login/signup),
   // redirect them to the dashboard.
   if (isAuth && isPublicRoute) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
@@ -24,7 +24,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
  
-  // Otherwise, allow the request to proceed.
+  // If none of the above conditions are met (e.g., user is authenticated and accessing a protected route,
+  // or a user is not authenticated and accessing a public route), allow the request to proceed.
   return NextResponse.next()
 }
  
