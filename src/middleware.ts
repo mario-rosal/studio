@@ -1,35 +1,60 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
- 
-const isAuthenticated = (request: NextRequest) => {
-  return request.cookies.has('auth_session');
-}
- 
-export function middleware(request: NextRequest) {
-  const isAuth = isAuthenticated(request);
-  const { pathname } = request.nextUrl;
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
 
+const SECRET_KEY = process.env.SESSION_SECRET;
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const sessionCookie = request.cookies.get('session')?.value;
+
+  // Public routes that don't require authentication
   const publicRoutes = ['/login', '/signup'];
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
-  // If the user is authenticated and trying to access a public route (like login/signup),
-  // redirect them to the dashboard.
-  if (isAuth && isPublicRoute) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  if (isPublicRoute) {
+     // If user is authenticated and tries to access login/signup, redirect to dashboard
+    if (sessionCookie) {
+      try {
+        const key = new TextEncoder().encode(SECRET_KEY);
+        await jwtVerify(sessionCookie, key);
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      } catch (error) {
+        // Invalid token, allow access to public route
+        return NextResponse.next();
+      }
+    }
+    return NextResponse.next();
   }
 
-  // If the user is not authenticated and trying to access a protected route,
-  // redirect them to the login page.
-  if (!isAuth && !isPublicRoute) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Protected routes require a valid session
+  if (sessionCookie === undefined) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
- 
-  // If none of the above conditions are met (e.g., user is authenticated and accessing a protected route,
-  // or a user is not authenticated and accessing a public route), allow the request to proceed.
-  return NextResponse.next()
+
+  try {
+    const key = new TextEncoder().encode(SECRET_KEY);
+    await jwtVerify(sessionCookie, key);
+    // If token is valid, continue to the requested page
+    return NextResponse.next();
+  } catch (error) {
+    // If token is invalid, redirect to login
+    console.error('Invalid session token:', error);
+    const response = NextResponse.redirect(new URL('/login', request.url));
+    response.cookies.delete('session'); // Clear the invalid cookie
+    return response;
+  }
 }
- 
+
 export const config = {
-  // Match all routes except for API routes, static files, and images.
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|sql).*)'],
-}
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
+};

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import {
   Menu,
 } from "lucide-react"
+import { jwtVerify } from "jose";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,26 +16,30 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
-import { AppSidebar, AppSidebarContent } from "./sidebar";
+import { AppSidebarContent } from "./sidebar";
 import { Logo } from "../icons/logo";
 import { logout } from "@/lib/actions";
 import { PageTitle } from "./page-title";
 
 
-function getSession() {
-  const sessionCookie = cookies().get("auth_session")?.value;
+async function getSession() {
+  const sessionCookie = cookies().get("session")?.value;
   if (!sessionCookie) return null;
   try {
-    return JSON.parse(sessionCookie);
+    const key = new TextEncoder().encode(process.env.SESSION_SECRET);
+    const { payload } = await jwtVerify(sessionCookie, key, {
+      algorithms: ['HS256']
+    });
+    return payload;
   } catch (error) {
-    console.error("Failed to parse session cookie:", error);
+    console.error("Failed to verify session cookie:", error);
     return null;
   }
 }
 
 
-export function Header() {
-  const session = getSession();
+export async function Header() {
+  const session = await getSession();
 
   const handleSupportClick = () => {
     window.location.href = "mailto:support@n8npilot.com";
@@ -67,14 +72,14 @@ export function Header() {
           <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar>
-                <AvatarImage src={session.avatar} alt={session.name} />
-                <AvatarFallback>{session.name?.charAt(0) || 'U'}</AvatarFallback>
+                <AvatarImage src={session.avatar as string} alt={session.name as string} />
+                <AvatarFallback>{(session.name as string)?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{session.name}</DropdownMenuLabel>
+            <DropdownMenuLabel>{session.name as string}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <Link href="/settings" passHref>
               <DropdownMenuItem>Settings</DropdownMenuItem>

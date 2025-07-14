@@ -8,6 +8,8 @@ import { randomUUID } from 'crypto';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { SignJWT, jwtVerify } from 'jose';
+import type { User } from './types';
 
 // --- Authentication Actions ---
 
@@ -59,6 +61,8 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required.'),
 });
 
+const key = new TextEncoder().encode(process.env.SESSION_SECRET);
+
 export async function login(formData: FormData) {
     const validatedFields = loginSchema.safeParse(Object.fromEntries(formData.entries()));
 
@@ -74,15 +78,22 @@ export async function login(formData: FormData) {
             throw new Error('Invalid email or password.');
         }
 
-        const user = result.rows[0];
+        const user: User = result.rows[0];
         const passwordsMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordsMatch) {
             throw new Error('Invalid email or password.');
         }
         
-        const sessionData = { id: user.id, name: user.name, email: user.email, role: user.role, avatar: user.avatar };
-        cookies().set('auth_session', JSON.stringify(sessionData), {
+        const sessionPayload = { id: user.id, name: user.name, email: user.email, role: user.role, avatar: user.avatar };
+        
+        const session = await new SignJWT(sessionPayload)
+            .setProtectedHeader({ alg: 'HS256' })
+            .setIssuedAt()
+            .setExpirationTime('1w')
+            .sign(key);
+
+        cookies().set('session', session, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             maxAge: 60 * 60 * 24 * 7, // One week
@@ -91,7 +102,7 @@ export async function login(formData: FormData) {
 
     } catch (error) {
         console.error('Login Error:', error);
-        if (error.message === 'Invalid email or password.') {
+        if (error.message.includes('Invalid')) {
           throw error;
         }
         throw new Error('Database Error: Failed to log in.');
@@ -101,7 +112,7 @@ export async function login(formData: FormData) {
 }
 
 export async function logout() {
-  cookies().delete('auth_session');
+  cookies().delete('session');
   redirect('/login');
 }
 
