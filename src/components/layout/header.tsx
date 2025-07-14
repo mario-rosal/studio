@@ -26,7 +26,9 @@ async function getSession() {
   const sessionCookie = cookies().get("session")?.value;
   if (!sessionCookie) return null;
   try {
-    const key = new TextEncoder().encode(process.env.SESSION_SECRET);
+    // IMPORTANT: Hardcoding the secret for debugging to match middleware/login action.
+    // This is NOT recommended for production.
+    const key = new TextEncoder().encode("e9b7a3e7-3e6e-4f7a-8f4b-2d3e1c5f7a9d");
     const { payload } = await jwtVerify(sessionCookie, key, {
       algorithms: ['HS256']
     });
