@@ -103,7 +103,7 @@ export async function login(formData: FormData) {
         });
 
     } catch (error) {
-        console.error('Login Error:', error);
+        console.error('Authentication Error:', error);
         if (error.message.includes('Invalid')) {
           throw error;
         }
