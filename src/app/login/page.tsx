@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,6 @@ import { Logo } from "@/components/icons/logo";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
   const { toast } = useToast();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -21,13 +19,15 @@ export default function LoginPage() {
     setError(null);
 
     const formData = new FormData(event.currentTarget);
-    const result = await login(formData);
-
-    if (result && result.error) {
-       setError(result.error);
+    try {
+      await login(formData);
+      // Redirect is handled by the server action
+    } catch (e: any) {
+       const errorMessage = e.message || "An unknown error occurred";
+       setError(errorMessage);
        toast({
         title: "Login Failed",
-        description: result.error,
+        description: errorMessage,
         variant: "destructive",
       });
     }

@@ -32,7 +32,7 @@ export async function signup(formData: FormData) {
     try {
         const existingUser = await db.query('SELECT * FROM users WHERE email = $1', [email]);
         if (existingUser.rows.length > 0) {
-            return { success: false, error: 'An account with this email already exists.' };
+            return { success: false, errors: { email: ['An account with this email already exists.'] } };
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -49,7 +49,7 @@ export async function signup(formData: FormData) {
 
     } catch (error) {
         console.error('Signup Error:', error);
-        return { success: false, error: 'Database Error: Failed to create user.' };
+        return { success: false, errors: { _form: ['Database Error: Failed to create user.'] } };
     }
 }
 
@@ -63,7 +63,7 @@ export async function login(formData: FormData) {
     const validatedFields = loginSchema.safeParse(Object.fromEntries(formData.entries()));
 
     if (!validatedFields.success) {
-        return { error: 'Invalid fields provided.' };
+        throw new Error('Invalid fields provided.');
     }
     
     const { email, password } = validatedFields.data;
@@ -71,14 +71,14 @@ export async function login(formData: FormData) {
     try {
         const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
         if (result.rows.length === 0) {
-            return { error: 'Invalid email or password.' };
+            throw new Error('Invalid email or password.');
         }
 
         const user = result.rows[0];
         const passwordsMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordsMatch) {
-            return { error: 'Invalid email or password.' };
+            throw new Error('Invalid email or password.');
         }
         
         const sessionData = { id: user.id, name: user.name, email: user.email, role: user.role };
@@ -91,7 +91,10 @@ export async function login(formData: FormData) {
 
     } catch (error) {
         console.error('Login Error:', error);
-        return { error: 'Database Error: Failed to log in.' };
+        if (error.message === 'Invalid email or password.') {
+          throw error;
+        }
+        throw new Error('Database Error: Failed to log in.');
     }
 
     redirect('/dashboard');
