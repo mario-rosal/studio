@@ -1,35 +1,32 @@
--- Create the executions table
 CREATE TABLE IF NOT EXISTS executions (
     id UUID PRIMARY KEY,
-    flow_name TEXT NOT NULL,
-    status TEXT NOT NULL,
+    flow_name VARCHAR(255) NOT NULL,
+    status VARCHAR(50) NOT NULL,
     timestamp TIMESTAMPTZ NOT NULL,
     duration REAL NOT NULL,
-    input_type TEXT,
+    input_type VARCHAR(100),
     input_data TEXT,
     input_attachment TEXT,
-    output_type TEXT,
+    output_type VARCHAR(100),
     output_data TEXT,
     output_attachment TEXT,
     logs TEXT,
     tokens_used INTEGER
 );
 
--- Create the parameters table
 CREATE TABLE IF NOT EXISTS parameters (
     id UUID PRIMARY KEY,
-    key TEXT NOT NULL UNIQUE,
-    value TEXT,
+    key VARCHAR(255) UNIQUE NOT NULL,
+    value TEXT NOT NULL,
     description TEXT
 );
 
--- Create the users table
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    avatar TEXT,
-    role TEXT NOT NULL,
-    status TEXT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    avatar VARCHAR(255),
+    role VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL,
     password TEXT
 );
