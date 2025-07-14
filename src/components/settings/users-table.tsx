@@ -70,13 +70,13 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  async function handleAddSubmit(formData: FormData) {
+  async function handleAddFormAction(formData: FormData) {
     const result = await createUser(formData);
     if (result?.errors) {
       console.error(result.errors);
       toast({ title: "Error", description: "Please check the form for errors.", variant: "destructive" });
     } else {
-      toast({ title: "Success", description: "User created successfully." });
+      toast({ title: "Success", description: "User invited successfully." });
       setAddDialogOpen(false);
     }
   }
@@ -86,7 +86,7 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
     setEditDialogOpen(true);
   }
 
-  async function handleEditSubmit(formData: FormData) {
+  async function handleEditFormAction(formData: FormData) {
     if (!selectedUser) return;
     const result = await updateUserRole(selectedUser.id, formData);
     if (result?.errors) {
@@ -123,18 +123,18 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
                     <Button size="sm" className="gap-1">
                         <PlusCircle className="h-3.5 w-3.5" />
                         <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                        Add User
+                        Invite User
                         </span>
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Add New User</DialogTitle>
+                        <DialogTitle>Invite New User</DialogTitle>
                         <DialogDescription>
                             Enter the details for the new user.
                         </DialogDescription>
                     </DialogHeader>
-                    <form action={handleAddSubmit} className="space-y-4">
+                    <form action={handleAddFormAction} className="space-y-4">
                         <div className="space-y-2">
                           <Label htmlFor="name">Name</Label>
                           <Input id="name" name="name" placeholder="e.g., John Doe" required />
@@ -158,7 +158,7 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="secondary" onClick={() => setAddDialogOpen(false)}>Cancel</Button>
-                            <Button type="submit">Add User</Button>
+                            <Button type="submit">Send Invitation</Button>
                         </DialogFooter>
                     </form>
                 </DialogContent>
@@ -240,7 +240,7 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
                     Change the role for {selectedUser?.name}.
                 </DialogDescription>
             </DialogHeader>
-            <form action={handleEditSubmit} className="space-y-4">
+            <form action={handleEditFormAction} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="edit-role">Role</Label>
                     <Select name="role" defaultValue={selectedUser?.role}>
