@@ -6,6 +6,7 @@ import db from './db';
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
 import bcrypt from 'bcrypt';
+import { cookies } from 'next/headers';
 
 // --- Authentication Actions ---
 
@@ -42,6 +43,7 @@ export async function signup(formData: FormData) {
             [id, name, email, hashedPassword, 'Technician', 'Active', avatar]
         );
         
+        revalidatePath('/settings');
         return { success: true };
 
     } catch (error) {
@@ -78,9 +80,16 @@ export async function login(formData: FormData) {
             return { success: false, error: 'Invalid email or password.' };
         }
         
-        // In a real app, you would set a session cookie here.
-        // For this demo, we'll just return success.
-        return { success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
+        // Set a session cookie
+        const sessionData = { id: user.id, name: user.name, email: user.email, role: user.role };
+        cookies().set('auth_session', JSON.stringify(sessionData), {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 60 * 60 * 24 * 7, // One week
+            path: '/',
+        });
+
+        return { success: true };
 
     } catch (error) {
         console.error('Login Error:', error);
@@ -182,17 +191,20 @@ export async function createUser(formData: FormData) {
     const id = randomUUID();
     const avatar = `https://i.pravatar.cc/150?u=${validatedFields.data.email}`;
     const status = 'Active';
+    const tempPassword = randomUUID(); // Not used for login, just to satisfy NOT NULL if needed.
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
 
     try {
         await db.query(
-            'INSERT INTO users (id, name, email, role, avatar, status) VALUES ($1, $2, $3, $4, $5, $6)',
-            [id, validatedFields.data.name, validatedFields.data.email, validatedFields.data.role, avatar, status]
+            'INSERT INTO users (id, name, email, role, avatar, status, password) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+            [id, validatedFields.data.name, validatedFields.data.email, validatedFields.data.role, avatar, status, hashedPassword]
         );
         revalidatePath('/settings');
-        return { message: 'User created successfully.' };
+        return { success: true, message: 'User created successfully.' };
     } catch (error) {
         console.error('Database Error:', error);
-        return { message: 'Database Error: Failed to Create User.' };
+        return { success: false, message: 'Database Error: Failed to Create User.' };
     }
 }
 

@@ -29,6 +29,7 @@ export default function LoginPage() {
         description: "Welcome back!",
       });
       router.push("/dashboard");
+      router.refresh(); // Refresh the page to update auth state
     } else {
       setError(result.error);
       toast({
