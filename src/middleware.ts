@@ -7,8 +7,6 @@ import { jwtVerify } from 'jose';
 const SECRET_KEY = "e9b7a3e7-3e6e-4f7a-8f4b-2d3e1c5f7a9d";
 
 export async function middleware(request: NextRequest) {
-  console.log('SESSION_SECRET available in middleware:', SECRET_KEY);
-  console.log('Cookies received:', request.cookies.getAll());
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get('session')?.value;
 
