@@ -23,15 +23,9 @@ export default function LoginPage() {
     const formData = new FormData(event.currentTarget);
     const result = await login(formData);
 
-    if (result.success) {
-      toast({
-        title: "Login Successful",
-        description: "Welcome back!",
-      });
-      router.push("/dashboard");
-    } else {
-      setError(result.error);
-      toast({
+    if (result && result.error) {
+       setError(result.error);
+       toast({
         title: "Login Failed",
         description: result.error,
         variant: "destructive",

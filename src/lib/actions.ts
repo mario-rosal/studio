@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { randomUUID } from 'crypto';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 // --- Authentication Actions ---
 
@@ -55,14 +56,14 @@ export async function signup(formData: FormData) {
 
 const loginSchema = z.object({
   email: z.string().email(),
-  password: z.string(),
+  password: z.string().min(1, 'Password is required.'),
 });
 
 export async function login(formData: FormData) {
     const validatedFields = loginSchema.safeParse(Object.fromEntries(formData.entries()));
 
     if (!validatedFields.success) {
-        return { success: false, error: 'Invalid email or password.' };
+        return { error: 'Invalid fields provided.' };
     }
     
     const { email, password } = validatedFields.data;
@@ -70,17 +71,16 @@ export async function login(formData: FormData) {
     try {
         const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
         if (result.rows.length === 0) {
-            return { success: false, error: 'Invalid email or password.' };
+            return { error: 'Invalid email or password.' };
         }
 
         const user = result.rows[0];
         const passwordsMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordsMatch) {
-            return { success: false, error: 'Invalid email or password.' };
+            return { error: 'Invalid email or password.' };
         }
         
-        // Set a session cookie
         const sessionData = { id: user.id, name: user.name, email: user.email, role: user.role };
         cookies().set('auth_session', JSON.stringify(sessionData), {
             httpOnly: true,
@@ -89,12 +89,12 @@ export async function login(formData: FormData) {
             path: '/',
         });
 
-        return { success: true };
-
     } catch (error) {
         console.error('Login Error:', error);
-        return { success: false, error: 'Database Error: Failed to log in.' };
+        return { error: 'Database Error: Failed to log in.' };
     }
+
+    redirect('/dashboard');
 }
 
 
