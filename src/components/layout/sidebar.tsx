@@ -13,10 +13,10 @@ import { logout } from "@/lib/actions";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/logs", label: "Logs", icon: FileText },
-  { href: "/inputs", label: "Inputs", icon: ArrowRightToLine },
-  { href: "/outputs", label: "Outputs", icon: ArrowLeftFromLine },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard/logs", label: "Logs", icon: FileText },
+  { href: "/dashboard/inputs", label: "Inputs", icon: ArrowRightToLine },
+  { href: "/dashboard/outputs", label: "Outputs", icon: ArrowLeftFromLine },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
 export function AppSidebarContent({ session }: { session: any }) {
@@ -25,7 +25,7 @@ export function AppSidebarContent({ session }: { session: any }) {
   return (
      <>
         <div className="flex h-14 items-center border-b border-sidebar-border px-4 lg:h-[60px] lg:px-6">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
+          <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
             <Logo className="h-6 w-6" />
             <span className="">n8nPilot</span>
           </Link>
