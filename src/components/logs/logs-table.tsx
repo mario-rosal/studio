@@ -52,17 +52,17 @@ export function LogsTable({ initialExecutions }: LogsTableProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]"><span className="sr-only">Details</span></TableHead>
-              <TableHead>Flow Name</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Timestamp</TableHead>
-              <TableHead className="text-right">Duration</TableHead>
-            </TableRow>
-          </TableHeader>
-          <Accordion type="single" collapsible asChild>
+        <Accordion type="single" collapsible className="w-full">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[50px]"><span className="sr-only">Details</span></TableHead>
+                <TableHead>Flow Name</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Timestamp</TableHead>
+                <TableHead className="text-right">Duration</TableHead>
+              </TableRow>
+            </TableHeader>
             <TableBody>
               {executions.map((execution) => (
                 <AccordionItem value={execution.id} key={execution.id} asChild>
@@ -137,8 +137,8 @@ export function LogsTable({ initialExecutions }: LogsTableProps) {
                 </AccordionItem>
               ))}
             </TableBody>
-          </Accordion>
-        </Table>
+          </Table>
+        </Accordion>
       </CardContent>
     </Card>
   );
