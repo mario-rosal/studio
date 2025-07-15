@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -16,10 +17,7 @@ const AccordionItem = React.forwardRef<
     ref={ref}
     className={cn(className)}
     {...props}
-    asChild
-  >
-    <>{props.children}</>
-  </AccordionPrimitive.Item>
+  />
 ))
 AccordionItem.displayName = "AccordionItem"
 
