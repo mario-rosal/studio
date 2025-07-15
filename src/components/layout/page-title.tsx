@@ -15,7 +15,7 @@ export function PageTitle() {
         <Logo className="h-6 w-6 md:hidden" />
         <Link href="/dashboard" className="hidden md:flex items-center gap-2">
           <Logo className="h-6 w-6" />
-          n8nPilot
+          MyTaskPanel Dashboard
         </Link>
         {formattedTitle !== 'Dashboard' && <span className="font-normal text-muted-foreground"> / {formattedTitle}</span>}
     </h1>

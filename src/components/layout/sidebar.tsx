@@ -27,7 +27,7 @@ export function AppSidebarContent({ session }: { session: any }) {
         <div className="flex h-14 items-center border-b border-sidebar-border px-4 lg:h-[60px] lg:px-6">
           <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
             <Logo className="h-6 w-6" />
-            <span className="">n8nPilot</span>
+            <span className="">MyTaskPanel</span>
           </Link>
         </div>
         <div className="flex-1">

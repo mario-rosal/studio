@@ -42,7 +42,7 @@ export async function Header() {
   const session = await getSession();
 
   const handleSupportClick = () => {
-    window.location.href = "mailto:support@n8npilot.com";
+    window.location.href = "mailto:support@mytaskpanel.com";
   };
   
   return (
